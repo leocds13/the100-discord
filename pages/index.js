@@ -60,7 +60,7 @@ function Title(props) {
 //export default HomePage;
 
 export default function PaginaInicial() {
-	const username = "LeonardoCab_San";
+	const username = "leocds13";
 
 	return (
 		<>
@@ -70,9 +70,9 @@ export default function PaginaInicial() {
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "center",
-					backgroundColor: appConfig.theme.colors.primary[500],
+					backgroundColor: appConfig.theme.colors.primary[700],
 					backgroundImage:
-						"url(https://virtualbackgrounds.site/wp-content/uploads/2020/08/the-matrix-digital-rain.jpg)",
+						"url(https://wallpaperaccess.com/full/638928.jpg)",
 					backgroundRepeat: "no-repeat",
 					backgroundSize: "cover",
 					backgroundBlendMode: "multiply",
@@ -88,11 +88,11 @@ export default function PaginaInicial() {
 							sm: "row",
 						},
 						width: "100%",
-						maxWidth: "700px",
+						maxWidth: "600px",
 						borderRadius: "5px",
 						padding: "32px",
 						margin: "16px",
-						boxShadow: "0 2px 10px 0 rgb(0 0 0 / 20%)",
+						boxShadow: "2px 3px 10px 7px rgb(0 100 200 / 80%)",
 						backgroundColor: appConfig.theme.colors.neutrals[700],
 					}}
 				>

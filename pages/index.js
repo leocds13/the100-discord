@@ -70,11 +70,16 @@ export default function PaginaInicial() {
 					display: "flex",
 					alignItems: "center",
 					justifyContent: "center",
-					backgroundColor: appConfig.theme.colors.primary[700],
+					flexDirection: {
+						xs: "column",
+						sm: "column",
+					},
+					backgroundColor: appConfig.theme.colors.primary[500],
 					backgroundImage:
-						"url(https://wallpaperaccess.com/full/638928.jpg)",
+						'url("https://wallpaperaccess.com/full/638928.jpg")',
 					backgroundRepeat: "no-repeat",
-					backgroundSize: "cover",
+					backgroundPosition: "0px 0px",
+					animation: "animatedBackground 30s linear infinite",
 					backgroundBlendMode: "multiply",
 				}}
 			>
@@ -96,7 +101,7 @@ export default function PaginaInicial() {
 					{/* Header Area */}
 					<Box
 						styleSheet={{
-							width: '100%',
+							width: "100%",
 							textAlign: "center",
 							justifyContent: "center",
 						}}
@@ -130,7 +135,7 @@ export default function PaginaInicial() {
 							styleSheet={{
 								borderRadius: "50%",
 								marginBottom: "16px",
-								boxShadow: `0 0 10px 10px ${appConfig.theme.colors.primary[900]}`
+								boxShadow: `0 0 10px 10px ${appConfig.theme.colors.primary[900]}`,
 							}}
 							src={`https://github.com/${username}.png`}
 						/>
@@ -174,7 +179,6 @@ export default function PaginaInicial() {
 										appConfig.theme.colors.neutrals[800],
 								},
 							}}
-
 						/>
 						<Button
 							type="submit"
@@ -193,7 +197,81 @@ export default function PaginaInicial() {
 					</Box>
 					{/* Formulário */}
 				</Box>
+				<Box
+					styleSheet={{
+						color: appConfig.theme.colors.neutrals[200],
+						backgroundColor: appConfig.theme.colors.neutrals[900],
+						padding: "10px",
+						borderRadius: "1000px",
+					}}
+				>
+					<a href="https://github.com/leocds13">💚 Leonardo Cabral</a>
+				</Box>
 			</Box>
+			<style jsx>
+				{`
+					a {
+						text-decoration: none;
+						color: ${appConfig.theme.colors.neutrals[300]};
+					}
+
+					@keyframes animatedBackground {
+						0% {
+							background-position: 0 0;
+						}
+						50% {
+							background-position: -260px 0;
+						}
+						100% {
+							background-position: 0 0;
+						}
+					}
+					@-moz-keyframes animatedBackground {
+						0% {
+							background-position: 0 0;
+						}
+						50% {
+							background-position: -260px 0;
+						}
+						100% {
+							background-position: 0 0;
+						}
+					}
+					@-webkit-keyframes animatedBackground {
+						0% {
+							background-position: 0 0;
+						}
+						50% {
+							background-position: -260px 0;
+						}
+						100% {
+							background-position: 0 0;
+						}
+					}
+					@-ms-keyframes animatedBackground {
+						0% {
+							background-position: 0 0;
+						}
+						50% {
+							background-position: -260px 0;
+						}
+						100% {
+							background-position: 0 0;
+						}
+					}
+					@-o-keyframes animatedBackground {
+						0% {
+							background-position: 0 0;
+						}
+						50% {
+							background-position: -260px 0;
+						}
+						100% {
+							background-position: 0 0;
+						}
+					}
+				`}
+			</style>
 		</>
 	);
 }

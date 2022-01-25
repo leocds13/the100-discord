@@ -32,7 +32,7 @@ function GlobalStyle() {
 }
 
 function Title(props) {
-	const Tag = props.tag || 'h1';
+	const Tag = props.tag || "h1";
 	return (
 		<>
 			<Tag>{props.children}</Tag>
@@ -83,75 +83,35 @@ export default function PaginaInicial() {
 						display: "flex",
 						alignItems: "center",
 						justifyContent: "space-between",
-						flexDirection: {
-							xs: "column",
-							sm: "row",
-						},
+						flexDirection: "column",
 						width: "100%",
-						maxWidth: "600px",
-						borderRadius: "5px",
+						maxWidth: "400px",
+						borderRadius: "30px",
 						padding: "32px",
 						margin: "16px",
-						boxShadow: "2px 3px 10px 7px rgb(0 100 200 / 80%)",
+						boxShadow: "2px 3px 10px 7px rgb(0 0 0 / 80%)",
 						backgroundColor: appConfig.theme.colors.neutrals[700],
 					}}
 				>
-					{/* Formulário */}
+					{/* Header Area */}
 					<Box
-						as="form"
 						styleSheet={{
-							display: "flex",
-							flexDirection: "column",
-							alignItems: "center",
-							justifyContent: "center",
-							width: { xs: "100%", sm: "50%" },
+							width: '100%',
 							textAlign: "center",
-							marginBottom: "32px",
+							justifyContent: "center",
 						}}
 					>
-						<Title tag="h2">Bem vindo Terrestre!</Title>
+						<Title>Bem vindo Terrestre!</Title>
 						<Text
 							variant="body3"
 							styleSheet={{
-								marginBottom: "32px",
 								color: appConfig.theme.colors.neutrals[300],
 							}}
 						>
 							{appConfig.name}
 						</Text>
-
-						<TextField
-							fullWidth
-							textFieldColors={{
-								neutral: {
-									textColor:
-										appConfig.theme.colors.neutrals[200],
-									mainColor:
-										appConfig.theme.colors.neutrals[900],
-									mainColorHighlight:
-										appConfig.theme.colors.primary[500],
-									backgroundColor:
-										appConfig.theme.colors.neutrals[800],
-								},
-							}}
-						/>
-						<Button
-							type="submit"
-							label="Entrar"
-							fullWidth
-							buttonColors={{
-								contrastColor:
-									appConfig.theme.colors.neutrals["000"],
-								mainColor: appConfig.theme.colors.primary[500],
-								mainColorLight:
-									appConfig.theme.colors.primary[400],
-								mainColorStrong:
-									appConfig.theme.colors.primary[600],
-							}}
-						/>
 					</Box>
-					{/* Formulário */}
-
+					{/* Header Area */}
 					{/* Photo Area */}
 					<Box
 						styleSheet={{
@@ -160,19 +120,17 @@ export default function PaginaInicial() {
 							alignItems: "center",
 							maxWidth: "200px",
 							padding: "16px",
-							backgroundColor:
-								appConfig.theme.colors.neutrals[800],
-							border: "1px solid",
-							borderColor: appConfig.theme.colors.neutrals[999],
 							borderRadius: "10px",
 							flex: 1,
 							minHeight: "240px",
+							marginBottom: "5px",
 						}}
 					>
 						<Image
 							styleSheet={{
 								borderRadius: "50%",
 								marginBottom: "16px",
+								boxShadow: `0 0 10px 10px ${appConfig.theme.colors.primary[900]}`
 							}}
 							src={`https://github.com/${username}.png`}
 						/>
@@ -190,6 +148,50 @@ export default function PaginaInicial() {
 						</Text>
 					</Box>
 					{/* Photo Area */}
+					{/* Formulário */}
+					<Box
+						as="form"
+						styleSheet={{
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+							justifyContent: "center",
+							width: { xs: "100%", sm: "75%" },
+							textAlign: "center",
+						}}
+					>
+						<TextField
+							fullWidth
+							textFieldColors={{
+								neutral: {
+									textColor:
+										appConfig.theme.colors.neutrals[200],
+									mainColor:
+										appConfig.theme.colors.neutrals[900],
+									mainColorHighlight:
+										appConfig.theme.colors.primary[500],
+									backgroundColor:
+										appConfig.theme.colors.neutrals[800],
+								},
+							}}
+
+						/>
+						<Button
+							type="submit"
+							label="Entrar"
+							fullWidth
+							buttonColors={{
+								contrastColor:
+									appConfig.theme.colors.neutrals["000"],
+								mainColor: appConfig.theme.colors.primary[500],
+								mainColorLight:
+									appConfig.theme.colors.primary[400],
+								mainColorStrong:
+									appConfig.theme.colors.primary[600],
+							}}
+						/>
+					</Box>
+					{/* Formulário */}
 				</Box>
 			</Box>
 		</>

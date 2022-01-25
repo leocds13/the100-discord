@@ -101,7 +101,7 @@ export default function PaginaInicial() {
 							justifyContent: "center",
 						}}
 					>
-						<Title>Bem vindo Terrestre!</Title>
+						<Title>Bem vindo Sky-Crew!</Title>
 						<Text
 							variant="body3"
 							styleSheet={{

@@ -1,35 +1,7 @@
 import { Box, Button, Text, TextField, Image } from "@skynexui/components";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import appConfig from "../config.json";
-
-function GlobalStyle() {
-	return (
-		<style global jsx>{`
-			* {
-				margin: 0;
-				padding: 0;
-				box-sizing: border-box;
-				list-style: none;
-			}
-			body {
-				font-family: "Open Sans", sans-serif;
-			}
-
-			html,
-			body,
-			#__next {
-				min-height: 100vh;
-				display: flex;
-				flex: 1;
-			}
-			#__next {
-				flex: 1;
-			}
-			#__next > * {
-				flex: 1;
-			}
-		`}</style>
-	);
-}
 
 function Title(props) {
 	const Tag = props.tag || "h1";
@@ -47,24 +19,19 @@ function Title(props) {
 	);
 }
 
-// function HomePage() {
-// 	return (
-// 		<div>
-//             <GlobalStyle />
-// 			<Title tag="h1">Boas vindas de volta!</Title>
-// 			<h2>Discord - Alura Matrix</h2>
-// 		</div>
-// 	);
-// }
-
-//export default HomePage;
-
 export default function PaginaInicial() {
-	const username = "leocds13";
+	const [username, setUsername] = useState("leocds13");
+	const [width, setWidth] = useState(0);
+	const roteamento = useRouter();
+
+	useEffect(() => {
+		setWidth(window.innerWidth * 0.1);
+	}, []);
+
+	const isUsernameValid = username.length > 2
 
 	return (
 		<>
-			<GlobalStyle />
 			<Box
 				styleSheet={{
 					display: "flex",
@@ -79,6 +46,7 @@ export default function PaginaInicial() {
 						'url("https://wallpaperaccess.com/full/638928.jpg")',
 					backgroundRepeat: "no-repeat",
 					backgroundPosition: "0px 0px",
+					backgroundSize: "110% 100%",
 					animation: "animatedBackground 30s linear infinite",
 					backgroundBlendMode: "multiply",
 				}}
@@ -126,36 +94,50 @@ export default function PaginaInicial() {
 							maxWidth: "200px",
 							padding: "16px",
 							borderRadius: "10px",
+							backgroundColor:
+								appConfig.theme.colors.neutrals[700],
+							borderColor: appConfig.theme.colors.neutrals[900],
+							borderWidth: "1px",
 							flex: 1,
 							minHeight: "240px",
-							marginBottom: "5px",
+							marginTop: "5px",
 						}}
 					>
-						<Image
-							styleSheet={{
-								borderRadius: "50%",
-								marginBottom: "16px",
-								boxShadow: `0 0 10px 10px ${appConfig.theme.colors.primary[900]}`,
-							}}
-							src={`https://github.com/${username}.png`}
-						/>
-						<Text
-							variant="body4"
-							styleSheet={{
-								color: appConfig.theme.colors.neutrals[200],
-								backgroundColor:
-									appConfig.theme.colors.neutrals[900],
-								padding: "3px 10px",
-								borderRadius: "1000px",
-							}}
-						>
-							{username}
-						</Text>
+						{isUsernameValid ? (
+							<>
+								<Image
+									styleSheet={{
+										borderRadius: "50%",
+										marginBottom: "16px",
+										boxShadow: `0 0 10px 10px ${appConfig.theme.colors.primary[900]}`,
+									}}
+									src={`https://github.com/${username}.png`}
+								/>
+								<Text
+									variant="body4"
+									styleSheet={{
+										color: appConfig.theme.colors
+											.neutrals[200],
+										backgroundColor:
+											appConfig.theme.colors
+												.neutrals[900],
+										padding: "3px 10px",
+										borderRadius: "1000px",
+									}}
+								>
+									{username}
+								</Text>
+							</>
+						) : null}
 					</Box>
 					{/* Photo Area */}
 					{/* Formulário */}
 					<Box
 						as="form"
+						onSubmit={(e) => {
+							e.preventDefault();
+							roteamento.push("/chat");
+						}}
 						styleSheet={{
 							display: "flex",
 							flexDirection: "column",
@@ -179,10 +161,16 @@ export default function PaginaInicial() {
 										appConfig.theme.colors.neutrals[800],
 								},
 							}}
+							name="username"
+							value={username}
+							onChange={({ target: { value } }) => {
+								setUsername(value);
+							}}
 						/>
 						<Button
 							type="submit"
 							label="Entrar"
+							disabled={!isUsernameValid}
 							fullWidth
 							buttonColors={{
 								contrastColor:
@@ -220,7 +208,7 @@ export default function PaginaInicial() {
 							background-position: 0 0;
 						}
 						50% {
-							background-position: -260px 0;
+							background-position: -${width.toFixed()}px 0;
 						}
 						100% {
 							background-position: 0 0;
@@ -231,7 +219,7 @@ export default function PaginaInicial() {
 							background-position: 0 0;
 						}
 						50% {
-							background-position: -260px 0;
+							background-position: -${width.toFixed()}px 0;
 						}
 						100% {
 							background-position: 0 0;
@@ -242,7 +230,7 @@ export default function PaginaInicial() {
 							background-position: 0 0;
 						}
 						50% {
-							background-position: -260px 0;
+							background-position: -${width.toFixed()}px 0;
 						}
 						100% {
 							background-position: 0 0;
@@ -253,7 +241,7 @@ export default function PaginaInicial() {
 							background-position: 0 0;
 						}
 						50% {
-							background-position: -260px 0;
+							background-position: -${width.toFixed()}px 0;
 						}
 						100% {
 							background-position: 0 0;
@@ -264,7 +252,7 @@ export default function PaginaInicial() {
 							background-position: 0 0;
 						}
 						50% {
-							background-position: -260px 0;
+							background-position: -${width.toFixed()}px 0;
 						}
 						100% {
 							background-position: 0 0;

@@ -222,7 +222,6 @@ function MessageList(props) {
 								label="X"
 								variant="tertiary"
 								onClick={() => {
-                                    console.log(props.mensagens)
 									const novaLista = props.mensagens.filter(
 										(value) => {
                                             return value.id != mensagem.id
@@ -230,7 +229,7 @@ function MessageList(props) {
 									).map((value, index) => {
                                         return {...value, id: index}
                                     });
-                                    console.log(novaLista)
+
 									props.setListMsg(novaLista);
 								}}
 							/>

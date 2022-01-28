@@ -1,6 +1,13 @@
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
-import React, { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+import React, { useEffect, useState } from "react";
 import appConfig from "../config.json";
+
+const supabaseAnonKey =
+	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzM2NDE1NywiZXhwIjoxOTU4OTQwMTU3fQ.jjpyeSUIOoRcqegY0lUSRtitd_CW3WO-3oX35m6Jw6s";
+const supabaseUrl = "https://tzqirlkczivpyhwghbzw.supabase.co";
+
+const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function ChatPage() {
 	// Lógica do field de mensagem
@@ -20,18 +27,33 @@ export default function ChatPage() {
 	// Lógica do field de mensagem
 
 	// Lógica de lista de mensagens
-	const [listMensagens, setListaMensagens] = useState([]);
+	const [listMensagens, setListaMensagens] = useState(null);
+
+	useEffect(() => {
+		supabaseClient
+			.from("mensagens")
+			.select("*")
+			.order("created_at", { ascending: false })
+			.then(({ data }) => {
+				setListaMensagens(data);
+			});
+	}, []);
 	// Lógica de lista de mensagens
 
 	// Lógica da tela
 	const handleNovaMensagem = (novaMensagem) => {
 		const mensagem = {
-			id: listMensagens.length + 1,
 			de: "leocds13",
 			texto: novaMensagem,
 		};
 
-		setListaMensagens([mensagem, ...listMensagens]);
+		supabaseClient
+			.from("mensagens")
+			.insert([mensagem])
+			.then(({ data }) => {
+				// console.log("Criando mensagem:" + data);
+				setListaMensagens([data[0], ...listMensagens]);
+			});
 
 		setMensagem("");
 	};
@@ -78,10 +100,15 @@ export default function ChatPage() {
 						padding: "16px",
 					}}
 				>
-					<MessageList
-						mensagens={listMensagens}
-						setListMsg={setListaMensagens}
-					/>
+					<LoadingArea />
+					{/* {listMensagens === null ? (
+						<LoadingArea />
+					) : (
+						<MessageList
+							mensagens={listMensagens}
+							setListMsg={setListaMensagens}
+						/>
+					)} */}
 
 					<Box
 						as="form"
@@ -159,6 +186,86 @@ function Header() {
 	);
 }
 
+function LoadingArea() {
+	return (
+		<Box
+			styleSheet={{
+				overflow: "auto",
+				display: "flex",
+				flexDirection: "column-reverse",
+				flex: 1,
+				color: appConfig.theme.colors.neutrals["000"],
+				marginBottom: "16px",
+			}}
+		>
+			<Box
+				tag="div"
+				styleSheet={{
+					borderRadius: "5px",
+					padding: "6px",
+					marginBottom: "12px",
+					hover: {
+						backgroundColor: appConfig.theme.colors.neutrals[700],
+					},
+				}}
+			>
+				<Box
+					styleSheet={{
+						display: "flex",
+						marginBottom: "8px",
+					}}
+				>
+					<Box
+						styleSheet={{
+							width: "20px",
+							height: "20px",
+							borderRadius: "50%",
+							display: "inline-block",
+							marginRight: "8px",
+							backgroundColor: "white",
+						}}
+					>
+					</Box>
+					<Box
+						styleSheet={{
+							width: "20%",
+							height: "20px",
+							borderRadius: "5px",
+							display: "block",
+							marginRight: "8px",
+							backgroundColor: "white",
+						}}
+					>
+						<Box
+							styleSheet={{
+								width: "0",
+								height: "20px",
+								boxShadow: "0 0 10px 10px rgb(0 0 0)"
+							}}
+						/>
+					</Box>
+				</Box>
+				<Box
+					styleSheet={{
+						width: "40%",
+						height: "20px",
+						borderRadius: "5px",
+						display: "inline-block",
+						marginRight: "8px",
+						backgroundColor: "white",
+					}}
+				/>
+			</Box>
+			<style jsx>{`
+				@keyframes loadingBackground {
+					from {
+					}
+				}
+			`}</style>
+		</Box>
+	);
+}
+
 function MessageList(props) {
 	return (
 		<Box
@@ -222,15 +329,26 @@ function MessageList(props) {
 								label="X"
 								variant="tertiary"
 								onClick={() => {
-									const novaLista = props.mensagens.filter(
-										(value) => {
-                                            return value.id != mensagem.id
-                                        }
-									).map((value, index) => {
-                                        return {...value, id: index}
-                                    });
+									supabaseClient
+										.from("mensagens")
+										.delete()
+										.match({ id: mensagem.id })
+										.then(() => {
+											const novaLista = props.mensagens
+												.filter((value) => {
+													return (
+														value.id != mensagem.id
+													);
+												})
+												.map((value, index) => {
+													return {
+														...value,
+														id: index,
+													};
+												});
 
-									props.setListMsg(novaLista);
+											props.setListMsg(novaLista);
+										});
 								}}
 							/>
 						</Box>

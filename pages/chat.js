@@ -1,7 +1,9 @@
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import { createClient } from "@supabase/supabase-js";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import appConfig from "../config.json";
+import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
 
 const supabaseAnonKey =
 	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzM2NDE1NywiZXhwIjoxOTU4OTQwMTU3fQ.jjpyeSUIOoRcqegY0lUSRtitd_CW3WO-3oX35m6Jw6s";
@@ -10,6 +12,9 @@ const supabaseUrl = "https://tzqirlkczivpyhwghbzw.supabase.co";
 const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
 export default function ChatPage() {
+	const roteamento = useRouter();
+	const usuarioLogado = roteamento.query.username;
+
 	// Lógica do field de mensagem
 	const [mensagem, setMensagem] = useState("");
 
@@ -37,22 +42,65 @@ export default function ChatPage() {
 			.then(({ data }) => {
 				setListaMensagens(data);
 			});
+
+		supabaseClient
+			.from("mensagens")
+			.on("*", (data) => {
+				console.log("* observer", data);
+
+				const events = {
+					INSERT(data) {
+						setListaMensagens((listaAntiga) => {
+							console.log("Insert valor antigo:", listaAntiga);
+							console.log("Insert valor novo:", [
+								data.new,
+								...listaAntiga,
+							]);
+							return [data.new, ...listaAntiga];
+						});
+					},
+					DELETE(data) {
+						setListaMensagens((listaAntiga) => {
+							const novaLista = listaAntiga.filter((value) => {
+								return value.id != data.old.id;
+							});
+							console.log("Delete valor antigo:", listaAntiga);
+							console.log("Delete valor novo:", novaLista);
+							return novaLista;
+						});
+					},
+				};
+				
+				if (events[data.eventType]) {
+					events[data.eventType](data)
+				}
+
+			})
+			.subscribe();
+
+		return () => {
+			console.log("unSubs");
+			supabaseClient.removeAllSubscriptions();
+		};
 	}, []);
 	// Lógica de lista de mensagens
 
 	// Lógica da tela
 	const handleNovaMensagem = (novaMensagem) => {
 		const mensagem = {
-			de: "leocds13",
+			de: usuarioLogado,
 			texto: novaMensagem,
 		};
 
 		supabaseClient
 			.from("mensagens")
 			.insert([mensagem])
-			.then(({ data }) => {
+			.then(() => {
 				// console.log("Criando mensagem:" + data);
-				setListaMensagens([data[0], ...listMensagens]);
+				// setListaMensagens([data[0], ...listMensagens]);
+			})
+			.catch((err) => {
+				console.log(err);
 			});
 
 		setMensagem("");
@@ -100,15 +148,15 @@ export default function ChatPage() {
 						padding: "16px",
 					}}
 				>
-					<LoadingArea />
-					{/* {listMensagens === null ? (
+					{/* <LoadingArea /> */}
+					{listMensagens === null ? (
 						<LoadingArea />
 					) : (
 						<MessageList
 							mensagens={listMensagens}
 							setListMsg={setListaMensagens}
 						/>
-					)} */}
+					)}
 
 					<Box
 						as="form"
@@ -137,6 +185,12 @@ export default function ChatPage() {
 							}}
 						/>
 
+						<ButtonSendSticker
+							onStickerClick={(sticker) => {
+								handleNovaMensagem(`:sticker: ${sticker}`);
+							}}
+						/>
+
 						<Button
 							label="Enviar"
 							onClick={() => {
@@ -153,6 +207,7 @@ export default function ChatPage() {
 							}}
 							styleSheet={{
 								height: "100%",
+								marginLeft: "8px",
 							}}
 						/>
 					</Box>
@@ -224,8 +279,7 @@ function LoadingArea() {
 							marginRight: "8px",
 							backgroundColor: "white",
 						}}
-					>
-					</Box>
+					></Box>
 					<Box
 						styleSheet={{
 							width: "20%",
@@ -240,7 +294,7 @@ function LoadingArea() {
 							styleSheet={{
 								width: "0",
 								height: "20px",
-								boxShadow: "0 0 10px 10px rgb(0 0 0)"
+								boxShadow: "0 0 10px 10px rgb(0 0 0)",
 							}}
 						/>
 					</Box>
@@ -267,6 +321,9 @@ function LoadingArea() {
 }
 
 function MessageList(props) {
+	const roteamento = useRouter();
+	const usuarioLogado = roteamento.query.username;
+
 	return (
 		<Box
 			tag="ul"
@@ -325,34 +382,48 @@ function MessageList(props) {
 									{new Date().toLocaleDateString()}
 								</Text>
 							</Box>
-							<Button
-								label="X"
-								variant="tertiary"
-								onClick={() => {
-									supabaseClient
-										.from("mensagens")
-										.delete()
-										.match({ id: mensagem.id })
-										.then(() => {
-											const novaLista = props.mensagens
-												.filter((value) => {
-													return (
-														value.id != mensagem.id
-													);
-												})
-												.map((value, index) => {
-													return {
-														...value,
-														id: index,
-													};
-												});
-
-											props.setListMsg(novaLista);
-										});
+							{usuarioLogado === mensagem.de ? (
+								<Button
+									label="X"
+									variant="tertiary"
+									onClick={() => {
+										supabaseClient
+											.from("mensagens")
+											.delete()
+											.match({ id: mensagem.id })
+											.then(() => {
+												// const novaLista =
+												// 	props.mensagens
+												// 		.filter((value) => {
+												// 			return (
+												// 				value.id !=
+												// 				mensagem.id
+												// 			);
+												// 		})
+												// 		.map((value, index) => {
+												// 			return {
+												// 				...value,
+												// 				id: index,
+												// 			};
+												// 		});
+												// props.setListMsg(novaLista);
+											});
+									}}
+								/>
+							) : null}
+						</Box>
+						{mensagem.texto.startsWith(":sticker:") ? (
+							<Image
+								src={mensagem.texto
+									.replace(":sticker:", "")
+									.trim()}
+								styleSheet={{
+									maxWidth: "150px",
 								}}
 							/>
-						</Box>
-						{mensagem.texto}
+						) : (
+							mensagem.texto
+						)}
 					</Text>
 				);
 			})}

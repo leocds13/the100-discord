@@ -3,11 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import appConfig from "../config.json";
+import { BoxLoading } from "../src/components/BoxLoading";
 import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
 
-const supabaseAnonKey =
-	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTY0MzM2NDE1NywiZXhwIjoxOTU4OTQwMTU3fQ.jjpyeSUIOoRcqegY0lUSRtitd_CW3WO-3oX35m6Jw6s";
-const supabaseUrl = "https://tzqirlkczivpyhwghbzw.supabase.co";
+const supabaseAnonKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.SUPABASE_URL;
 
 const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -34,6 +34,22 @@ export default function ChatPage() {
 	// Lógica de lista de mensagens
 	const [listMensagens, setListaMensagens] = useState(null);
 
+	const events = {
+		INSERT(data) {
+			setListaMensagens((listaAntiga) => {
+				return [data.new, ...listaAntiga];
+			});
+		},
+		DELETE(data) {
+			setListaMensagens((listaAntiga) => {
+				const novaLista = listaAntiga.filter((value) => {
+					return value.id != data.old.id;
+				});
+				return novaLista;
+			});
+		},
+	};
+
 	useEffect(() => {
 		supabaseClient
 			.from("mensagens")
@@ -46,40 +62,13 @@ export default function ChatPage() {
 		supabaseClient
 			.from("mensagens")
 			.on("*", (data) => {
-				console.log("* observer", data);
-
-				const events = {
-					INSERT(data) {
-						setListaMensagens((listaAntiga) => {
-							console.log("Insert valor antigo:", listaAntiga);
-							console.log("Insert valor novo:", [
-								data.new,
-								...listaAntiga,
-							]);
-							return [data.new, ...listaAntiga];
-						});
-					},
-					DELETE(data) {
-						setListaMensagens((listaAntiga) => {
-							const novaLista = listaAntiga.filter((value) => {
-								return value.id != data.old.id;
-							});
-							console.log("Delete valor antigo:", listaAntiga);
-							console.log("Delete valor novo:", novaLista);
-							return novaLista;
-						});
-					},
-				};
-				
 				if (events[data.eventType]) {
-					events[data.eventType](data)
+					events[data.eventType](data);
 				}
-
 			})
 			.subscribe();
 
 		return () => {
-			console.log("unSubs");
 			supabaseClient.removeAllSubscriptions();
 		};
 	}, []);
@@ -92,16 +81,18 @@ export default function ChatPage() {
 			texto: novaMensagem,
 		};
 
-		supabaseClient
-			.from("mensagens")
-			.insert([mensagem])
-			.then(() => {
-				// console.log("Criando mensagem:" + data);
-				// setListaMensagens([data[0], ...listMensagens]);
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		if (!(listMensagens === null)) {
+			supabaseClient
+				.from("mensagens")
+				.insert([mensagem])
+				.then(() => {
+					// console.log("Criando mensagem:" + data);
+					// setListaMensagens([data[0], ...listMensagens]);
+				})
+				.catch((err) => {
+					console.log(err);
+				});
+		}
 
 		setMensagem("");
 	};
@@ -148,7 +139,6 @@ export default function ChatPage() {
 						padding: "16px",
 					}}
 				>
-					{/* <LoadingArea /> */}
 					{listMensagens === null ? (
 						<LoadingArea />
 					) : (
@@ -270,52 +260,32 @@ function LoadingArea() {
 						marginBottom: "8px",
 					}}
 				>
-					<Box
-						styleSheet={{
+					<BoxLoading
+						style={{
 							width: "20px",
 							height: "20px",
 							borderRadius: "50%",
-							display: "inline-block",
 							marginRight: "8px",
-							backgroundColor: "white",
 						}}
-					></Box>
-					<Box
-						styleSheet={{
+					/>
+					<BoxLoading
+						style={{
 							width: "20%",
 							height: "20px",
 							borderRadius: "5px",
-							display: "block",
 							marginRight: "8px",
-							backgroundColor: "white",
 						}}
-					>
-						<Box
-							styleSheet={{
-								width: "0",
-								height: "20px",
-								boxShadow: "0 0 10px 10px rgb(0 0 0)",
-							}}
-						/>
-					</Box>
+					/>
 				</Box>
-				<Box
-					styleSheet={{
+				<BoxLoading
+					style={{
 						width: "40%",
 						height: "20px",
 						borderRadius: "5px",
-						display: "inline-block",
 						marginRight: "8px",
-						backgroundColor: "white",
 					}}
 				/>
 			</Box>
-			<style jsx>{`
-				@keyframes loadingBackground {
-					from {
-					}
-				}
-			`}</style>
 		</Box>
 	);
 }
@@ -323,6 +293,10 @@ function LoadingArea() {
 function MessageList(props) {
 	const roteamento = useRouter();
 	const usuarioLogado = roteamento.query.username;
+
+	// const [showUserInfo, setShowUserInfo] = useState("");
+	const [UserInfo, setUserInfo] = useState({});
+
 
 	return (
 		<Box
@@ -359,6 +333,39 @@ function MessageList(props) {
 							}}
 						>
 							<Box>
+								{UserInfo.login && (
+									<Box
+										styleSheet={{
+											display: "flex",
+											flexDirection: 'column',
+											minWidth: "70px",
+											maxHeight: "90px",
+											padding: "6px",
+											position: "Absolute",
+											marginTop: "-90px",
+											marginLeft: "-20px",
+											borderRadius: "10px",
+											justifyContent: "center",
+											alignItems: 'center',
+											backgroundColor:
+												appConfig.theme.colors
+													.neutrals[800],
+										}}
+									>
+										<Text>{UserInfo.login}</Text>
+										<Image
+											styleSheet={{
+												width: "50px",
+												height: "50px",
+												borderRadius: "50%",
+												display: "inline-block",
+												marginRight: "8px",
+											}}
+											src={`https://github.com/${mensagem.de}.png`}
+										/>
+										<Text>{UserInfo.name}</Text>
+									</Box>
+								)}
 								<Image
 									styleSheet={{
 										width: "20px",
@@ -368,6 +375,20 @@ function MessageList(props) {
 										marginRight: "8px",
 									}}
 									src={`https://github.com/${mensagem.de}.png`}
+									onMouseEnter={() => {
+										fetch(`https://api.github.com/users/${mensagem.de}`)
+											.then((data) => {
+												return data.json();
+											})
+											.then((data) => {
+												setUserInfo(data);
+											});
+										// setShowUserInfo(mensagem.de);
+									}}
+									onMouseLeave={() => {
+										setUserInfo({});
+										// setShowUserInfo("");
+									}}
 								/>
 								<Text tag="strong">{mensagem.de}</Text>
 								<Text
@@ -386,28 +407,15 @@ function MessageList(props) {
 								<Button
 									label="X"
 									variant="tertiary"
+									style={{
+										height: "20px",
+									}}
 									onClick={() => {
 										supabaseClient
 											.from("mensagens")
 											.delete()
 											.match({ id: mensagem.id })
-											.then(() => {
-												// const novaLista =
-												// 	props.mensagens
-												// 		.filter((value) => {
-												// 			return (
-												// 				value.id !=
-												// 				mensagem.id
-												// 			);
-												// 		})
-												// 		.map((value, index) => {
-												// 			return {
-												// 				...value,
-												// 				id: index,
-												// 			};
-												// 		});
-												// props.setListMsg(novaLista);
-											});
+											.then(() => {});
 									}}
 								/>
 							) : null}

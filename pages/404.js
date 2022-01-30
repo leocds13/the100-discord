@@ -29,11 +29,17 @@ export default function NotFoundPage() {
 					justifyContent: "center",
 					alignItems: "center",
                     textAlign: 'center',
+					borderRadius: '20px',
 					backgroundColor: AppConfig.theme.colors.neutrals[200],
 				}}
 			>
-				<Text>
-					Parece que vcê aterricou junto com a Clark na terra
+				<Text
+					variant="body1"
+					styleSheet={{
+						marginBottom: '20px',
+					}}
+				>
+					Parece que você aterrissou junto com a Clark na terra
 					inabitavel!
 				</Text>
 				<Text styleSheet={{marginTop: 15}}>Volte de onde veio e ache seu caminho</Text>

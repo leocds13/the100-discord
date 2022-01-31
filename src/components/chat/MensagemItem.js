@@ -1,4 +1,4 @@
-import { Box, Image, Text } from "@skynexui/components";
+import { Box, Button, Image, Text } from "@skynexui/components";
 import moment from "moment";
 import { useRouter } from "next/router";
 import { useState } from "react";

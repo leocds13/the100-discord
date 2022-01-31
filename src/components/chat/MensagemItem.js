@@ -13,7 +13,6 @@ export function MensagemItem({ mensagem }) {
 
 	return (
 		<Text
-			key={mensagem.id}
 			tag="li"
 			styleSheet={{
 				borderRadius: "5px",

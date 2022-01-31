@@ -19,7 +19,7 @@ export function MessageList(props) {
 		>
 			{props.mensagens.map((msg) => {
 				return (
-					<MensagemItem mensagem={msg}  />
+					<MensagemItem key={msg.id} mensagem={msg}  />
 				);
 			})}
 		</Box>
